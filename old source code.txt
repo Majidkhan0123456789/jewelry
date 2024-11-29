@@ -1,0 +1,117 @@
+ 'use client';
+import Image from "next/image";
+import { HiMenu, HiX } from "react-icons/hi"; // Menu and close icons for mobile
+import { useState, useEffect, useMemo } from "react";
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+
+const Links = [
+  { path: '/', name: 'Home' },
+  { path: '/services', name: 'Our Services' },
+  { path: '/team', name: 'Our Team' },
+  { path: '/recruitment', name: 'Recruitment' }, 
+];
+
+export default function Header() {
+  const pathname = usePathname();
+  const router = useRouter();  
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Memoize pageTitles to prevent re-creation on every render
+  const pageTitles = useMemo(() => ({
+    '/': 'Home - Lolaab',
+    '/services': 'Our Services - Lolaab',
+    '/team': 'Our Team - Lolaab',
+    '/recruitment': 'Recruitment - Lolaab',
+    '/uploadcv': 'Upload CV - Lolaab',
+    '/contactform': 'Recruit Manpower - Lolaab',
+  }), []);
+
+  useEffect(() => {
+    const title = pageTitles[pathname] || 'Lolaab Enterprises';
+    document.title = title;
+  }, [pathname, pageTitles]); // Add pageTitles as a dependency
+
+  return (
+    <>
+      <header className="bg-[#ededed] shadow">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6 ">
+            <div className="flex items-center space-x-4">
+            <Link href='/' className=" cursor-pointer ">
+              <Image src="/lolaab_logo.png" alt="Logo" width={120} height={50} className="h-[50px] w-[150px]" />
+            </Link>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex space-x-10 items-center">
+              {Links.map((link, index) => {
+                const isActive = pathname === link.path;
+                return (
+                  <Link  key={index}  href={link.path} className={`hover:text-[#E9b122] font-bold md:text-lg text-justify 2xl:text-2xl lg:text-xl text-base ${isActive ? 'text-[#E9b122]' : 'text-[#5d5d5d]'}`}
+                  >
+                    <span>{link.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Buttons for desktop */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <Link href="/uploadcv">
+                <button 
+                  className={`flex gap-2 items-center px-4 py-2 md:text-lg text-justify 2xl:text-2xl lg:text-xl text-[#5d5d5d] hover:text-[#E9b122]-100 ${pathname === '/uploadcv' ? 'underline text-[#E9b122]' : ''}`} 
+                  style={{ textDecoration: pathname === '/uploadcv' ? 'underline' : 'none', textUnderlineOffset: '8px', textDecorationColor: '#E9b122', color:'#E9b122' }}
+                >
+                  Upload CV
+                </button>
+              </Link>
+
+              <button 
+                className="px-4 py-3 bg-[#E9b122] hover:outline text-white rounded-3xl hover:bg-white hover:text-[#E9b122]"
+                onClick={() => router.push('/contactform')}
+              >
+                Recruit Manpower
+              </button>
+            </div>
+
+            <div className="lg:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-[#5d5d5d] hover:text-black">
+                {mobileMenuOpen ? <HiX size={30} /> : <HiMenu size={30} />}
+              </button>
+            </div>
+          </div>
+
+          {mobileMenuOpen && (
+            <div className="lg:hidden">
+              <nav className="flex flex-col space-y-4 py-4">
+                {Links.map((link, index) => {
+                  const isActive = pathname === link.path;
+                  return (
+                    <Link 
+                      key={index} 
+                      href={link.path}
+                      className={`block hover:text-[#E9b122] ${isActive ? 'text-[#E9b122] font-bold' : 'text-gray-600'}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span>{link.name}</span>
+                    </Link>
+                  );
+                })}
+
+                <Link href="/uploadcv">
+                  <button 
+                    className={`flex gap-2 items-center lg:px-4 py-2 text-[#5d5d5d] hover:text-[#5BACC6]-100 ${pathname === '/uploadcv' ? 'underline text-[#E9b122]' : ''}`} 
+                    style={{ textDecoration: pathname === '/uploadcv' ? 'underline' : 'none', textUnderlineOffset: '8px', textDecorationColor: '#EACF89' }}
+                  >
+                    Upload CV
+                  </button>
+                </Link>
+              </nav>
+            </div>
+          )}
+        </div>
+      </header>
+    </>
+  );
+}
